@@ -11,14 +11,16 @@ class BackendBase(metaclass=ABCMeta):
     @abstractmethod
     def recv(self, length):
         """
-        Receives at maximum length bytes of data from the backend.
+        Receives at maximum length bytes of data from the backend. Returns the
+        received buffer as byte string.
         """
         pass
 
     @abstractmethod
     def send(self, data):
         """
-        Sends the given data via this backend.
+        Sends the given data via this backend. Returns the amount of bytes that
+        have actually been sent.
         """
         pass
 
@@ -26,6 +28,6 @@ class BackendBase(metaclass=ABCMeta):
     def is_connected(self):
         """
         Returns True if the backend is connected and able to send and receive
-        data at the moment.
+        data at the moment. Otherwise False is returned.
         """
         pass
