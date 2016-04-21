@@ -1,6 +1,9 @@
 # Copyright 2016-2016 the s3tp authors, LGPLv3+. See copying.md for legal info.
+"""
+Implements the base class for backends of s3tp.
+"""
 
-from abc import ABCMeta
+from abc import abstractmethod, ABCMeta
 
 
 class BackendBase(metaclass=ABCMeta):

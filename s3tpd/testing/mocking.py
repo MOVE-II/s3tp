@@ -1,4 +1,8 @@
 # Copyright 2016-2016 the s3tp authors, LGPLv3+. See copying.md for legal info.
+"""
+Basic implementation of a mocking mixin that adds mocking functionality to
+other classes.
+"""
 
 from functools import wraps
 
@@ -36,7 +40,7 @@ class Mock:
         """
         return self._baked
 
-    def expect(self, name, return_value=None, *args):
+    def expect(self, name, *, return_value=None):
         """
         Adds an expectation to this mock. A call to the method with the given
         name is expected. The given return value will be returned by the
@@ -59,15 +63,15 @@ class Mock:
         return return_value
 
 
-def create_mock(f):
+def create_mock(function):
     """
     Creates a mocking proxy for the given function.
     """
-    @wraps(f)
-    def _inner(self, *args, **kwargs):
+    @wraps(function)
+    def _inner(self, *args, **_):
         if self._mock.is_baked():
-            return self._mock.do_mock(f.__name__)
-        self._mock.expect(f.__name__, *args)
+            return self._mock.do_mock(function.__name__)
+        self._mock.expect(function.__name__, *args)
         return self
     return _inner
 
@@ -80,7 +84,7 @@ class MockingMetaClass(type):
     # functions that are excluded from being mocked
     NON_MOCKING_FUNCTIONS = ['__init__', 'bake']
 
-    def __new__(cls, name, bases, attrs):
+    def __new__(mcs, name, bases, attrs):
         """
         Replaces all methods of the constructed class with mocking methods.
         """
@@ -88,12 +92,12 @@ class MockingMetaClass(type):
             if attr_name not in MockingMetaClass.NON_MOCKING_FUNCTIONS\
                     and callable(value):
                 attrs[attr_name] = create_mock(value)
-        return super().__new__(cls, name, bases, attrs)
+        return super().__new__(mcs, name, bases, attrs)
 
 
-class MockingMixing(metaclass=MockingMetaClass):
+class MockingMixin(metaclass=MockingMetaClass):
     """
-    A mixin that adds mocking functionality to
+    A mixin that adds mocking functionality to other classes.
     """
 
     def __init__(self):
