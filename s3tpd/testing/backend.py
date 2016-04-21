@@ -3,10 +3,11 @@
 Implements a mocking backend.
 """
 
+from ..backend.backendbase import BackendBase
 from .mocking import MockingMixin
 
 
-class MockBackend(MockingMixin):
+class MockBackend(BackendBase, MockingMixin):
     """
     A mocking backend that is programmable to simulate different backend
     behavior to the user.

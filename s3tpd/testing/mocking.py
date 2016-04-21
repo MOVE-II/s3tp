@@ -4,6 +4,7 @@ Basic implementation of a mocking mixin that adds mocking functionality to
 other classes.
 """
 
+from abc import ABCMeta
 from functools import wraps
 
 
@@ -40,12 +41,15 @@ class Mock:
         """
         return self._baked
 
-    def expect(self, name, *, return_value=None):
+    def expect(self, name, *args):
         """
         Adds an expectation to this mock. A call to the method with the given
         name is expected. The given return value will be returned by the
         expected call.
         """
+        return_value = None
+        if args:
+            return_value = args[0]
         self._expectations.append((name, return_value))
 
     def do_mock(self, actual_name):
@@ -76,7 +80,7 @@ def create_mock(function):
     return _inner
 
 
-class MockingMetaClass(type):
+class MockingMetaClass(ABCMeta):
     """
     Meta class that replaces all methods of a class by mocking methods.
     """
