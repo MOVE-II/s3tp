@@ -15,6 +15,69 @@ class MockException(Exception):
     pass
 
 
+class Expectation:
+    """
+    Base class for an expected behavior of a mocked class. Simulates a method
+    call of the mocked class.
+    """
+
+    def __init__(self, name):
+        """
+        Constructor.
+        """
+        self._name = name
+
+    def execute(self, actual_name):
+        """
+        Simulates the expected method. If the actually called method has not
+        the same name a MockException is raised.
+        """
+        if self._name != actual_name:
+            raise MockException("Expected call to {} but actual call was {}"
+                                .format(self._name, actual_name))
+
+
+class ReturnExpectation(Expectation):
+    """
+    Implementation of an expected behavior for methods that return a value.
+    """
+
+    def __init__(self, name, return_value):
+        """
+        Constructor.
+        """
+        super().__init__(name)
+        self._return_value = return_value
+
+    def execute(self, actual_name):
+        """
+        Simulates the expected method and returns the expected value.
+        """
+        super().execute(actual_name)
+        return self._return_value
+
+
+class ExceptionExpectation(Expectation):
+    """
+    Implementation of an expected behavior for methods that raise an exception.
+    """
+
+    def __init__(self, name, exception):
+        """
+        Constructor.
+        """
+        super().__init__(name)
+        self._exception = exception
+
+    def execute(self, actual_name):
+        """
+        Simulates the expected method and raises the expected exception
+        """
+        super().execute(actual_name)
+        raise self._exception
+
+
+
 class Mock:
     """
     Encapsulates the state of a mocking object. Keeps track of expected method
@@ -45,26 +108,26 @@ class Mock:
         """
         Adds an expectation to this mock. A call to the method with the given
         name is expected. The given return value will be returned by the
-        expected call.
+        expected call. If the given return value is an exception type, it will
+        be raised instead.
         """
-        return_value = None
+        value = None
         if args:
-            return_value = args[0]
-        self._expectations.append((name, return_value))
+            value = args[0]
+            if isinstance(value, Exception):
+                self._expectations.append(ExceptionExpectation(name, value))
+                return
+        self._expectations.append(ReturnExpectation(name, value))
 
     def do_mock(self, actual_name):
         """
         Does the actual mocking of a method call. If the given actual_name is
         not equal to the expected method name or if no other call is expected a
-        MockException is raised. Returns the expected return value.
+        MockException is raised. Simulates the expected method call.
         """
         if not self._expectations:
             raise MockException("No more method calls are expected")
-        expected_name, return_value = self._expectations.pop(0)
-        if expected_name != actual_name:
-            raise MockException("Expected call to {} but actual call was {}"
-                                .format(expected_name, actual_name))
-        return return_value
+        return self._expectations.pop(0).execute(actual_name)
 
 
 def create_mock(function):
