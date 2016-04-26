@@ -20,6 +20,10 @@ class TcpBackend(BackendBase):
         self._is_connected = False
 
     def listen_for_peer(self, host, port):
+        """
+        Listens on the given host and port for a peer. Blocks until a peer
+        connects.
+        """
         self._sock.bind((host, port))
         self._sock.listen(1)
 
@@ -29,17 +33,32 @@ class TcpBackend(BackendBase):
         self._sock = conn
 
     def connect_to_peer(self, host, port):
+        """
+        Connects to a listening peer on the given host and port.
+        """
         self._sock.connect((host, port))
 
     def close(self):
+        """
+        Closes the underlying tcp connection.
+        """
         self._is_connected = False
         self._sock.close()
 
     def recv(self, length):
+        """
+        See superclass.
+        """
         return self._sock.recv(length)
 
     def send(self, data):
+        """
+        See superclass
+        """
         return self._sock.send(data)
 
     def is_connected(self):
+        """
+        See superclass.
+        """
         return self._is_connected
