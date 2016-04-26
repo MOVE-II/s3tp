@@ -53,3 +53,7 @@ perf.data*
 /ylwrap
 Makefile
 Makefile.in
+
+# ctrlp and rope for vim
+.ctrlp
+.ropeproject
