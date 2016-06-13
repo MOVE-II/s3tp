@@ -34,3 +34,19 @@ class BackendBase(metaclass=ABCMeta):
         data at the moment. Otherwise False is returned.
         """
         pass
+
+    @classmethod
+    @abstractmethod
+    def read_config(cls, cfg):
+        """
+        Process the parsed config and pick out parts interesting
+        for this backend.
+        """
+        pass
+
+    @abstractmethod
+    async def create(self):
+        """
+        asynchronous initialization for this backend
+        """
+        pass

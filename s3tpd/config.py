@@ -10,6 +10,8 @@ import os
 from configparser import ConfigParser
 from pathlib import Path
 
+from .backend.tcp import TCPBackend
+
 
 class Config:
     """ Main configuration file """
@@ -29,10 +31,19 @@ class Config:
 
             # main config
             main = raw["s3tpd"]
-            self.backend = main["backend"]
+            backend = main["backend"]
             self.comm_socket = main["comm_socket"]
             self.comm_socket_group = main.get("comm_socket_group")
             self.comm_socket_permissions = main.get("comm_socket_permissions")
+
+            if backend == "tcp":
+                self.backend = TCPBackend
+            elif backend == "com":
+                raise Exception("TODO: com backend")
+            else:
+                raise Exception("unknown backend %s" % self.backend)
+
+            self.backend_cfg = self.backend.read_config(raw)
 
         except KeyError as exc:
             logging.error(

@@ -76,6 +76,7 @@ class S3TPD:
 
             return proto
 
+        # create unix socket to listen for tool requests
         logging.warn("listening on '%s'..." % self.cfg.comm_socket)
         self.server = await self.loop.create_unix_server(
             create_proto, self.cfg.comm_socket)
@@ -89,6 +90,10 @@ class S3TPD:
         if self.cfg.comm_socket_permissions:
             mode = int(self.cfg.comm_socket_permissions, 8)
             os.chmod(self.cfg.comm_socket, mode)
+
+        # create backend
+        self.connection = self.cfg.backend(self.cfg.backend_cfg, self.loop)
+        await self.connection.create()
 
 
     def get_connection_id(self):

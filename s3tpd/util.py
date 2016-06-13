@@ -3,6 +3,12 @@
 import logging
 
 
+class Namespace:
+    """
+    A dummy class to add members like a dict.
+    """
+    pass
+
 def clamp(number, smallest, largest):
     """ return number but limit it to the inclusive given value range """
     return max(smallest, min(number, largest))
